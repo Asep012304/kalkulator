@@ -19,7 +19,7 @@
       background-color: black;
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 100px 200px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 10px white;
       width: 300px;
     }
     .calculator input{
@@ -100,14 +100,19 @@
       border: none;
       border-radius: 10px;
       background-color: #121212;
+      box-shadow: 0px 2px 0px #CCC;
       transition: background-color 0.2s ease;
       cursor: pointer;
+    }
+    .buttons button:active {
+      transform: translateY(3px);
+      box-shadow: 0px 0px 0px;
     }
     .buttons button:hover{
       background-color: #1f1f1f;
     }
     .operator{
-      background-color: yellow;
+      background-color: black;
       color: whitesmoke;
     }
     .buttons button.operator{
@@ -116,18 +121,18 @@
     }
     .buttons button.operator:hover{
       background-color: #1c1c1c;
-      color: white;
+      color: whitesmoke;
     }
     .buttons button.deletes{
       background-color: #FFA500;
-      color: white;
+      color: whitesmoke;
     }
     .buttons button.deletes:hover{
       background-color: #CC8400;
     }
     .buttons button.clear{
       background-color: red;
-      color: white;
+      color: whitesmoke;
     }
     .buttons button.clear:hover{
       background-color: rgb(139, 0, 0);
