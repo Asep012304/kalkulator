@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  </head>
+  <style>
+    body{
+      background: linear-gradient(to right, #2c2c2c, #111111);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, Sans-Serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .calculator{
+      background-color: black;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 100px 200px rgba(0, 0, 0, 0.2);
+      width: 300px;
+    }
+    .calculator input{
+      width: 100%;
+      padding: 15px;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      text-align: right;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      box-sizing: border-box;
+      color: white;
+    }
+    .equal {
+     grid-column: span 2;
+     border: none;
+     outline: none;
+     color: #FFF;
+     position: relative;
+     z-index: 0;
+     border-radius: 12px;
+    }
+    .equal::after {
+     content: "";
+     z-index: -1;
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     background-color: #333;
+     left: 0;
+     top: 0;
+     border-radius: 10px;
+    }
+    .equal:before {
+     content: "";
+     background: linear-gradient(
+     45deg,
+     #FF0000, #FF7300, #FFFB00, #48FF00,
+     #00FFD5, #002BFF, #FF00C8, #FF0000
+    );
+     position: absolute;
+     top: -2px;
+     left: -2px;
+     background-size: 600%;
+     z-index: -1;
+     width: calc(100% + 4px);
+     height:  calc(100% + 4px);
+     filter: blur(8px);
+     animation: glowing 20s linear infinite;
+     transition: opacity .3s ease-in-out;
+     border-radius: 10px;
+     opacity: 0;
+    }
+     @keyframes glowing {
+      0% {background-position: 0 0;}
+     50% {background-position: 400% 0;}
+     100% {background-position: 0 0;}
+    }
+    .equal:hover::before {
+     opacity: 1;
+    }
+    .equal:active:after {
+     background: transparent;
+    }
+    .equal:active {
+     color: #000;
+     font-weight: bold;
+    }
+    .buttons{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .buttons button{
+      padding: 15px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #121212;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+    }
+    .buttons button:hover{
+      background-color: #1f1f1f;
+    }
+    .operator{
+      background-color: yellow;
+      color: whitesmoke;
+    }
+    .buttons button.operator{
+      background-color: #2E2E2E;
+      color: whitesmoke;
+    }
+    .buttons button.operator:hover{
+      background-color: #1c1c1c;
+      color: white;
+    }
+    .buttons button.deletes{
+      background-color: #FFA500;
+      color: white;
+    }
+    .buttons button.deletes:hover{
+      background-color: #CC8400;
+    }
+    .buttons button.clear{
+      background-color: red;
+      color: white;
+    }
+    .buttons button.clear:hover{
+      background-color: rgb(139, 0, 0);
+    }
+    .angka {
+      color: #00BFFF;
+    }
+    .calculator * {
+     -webkit-user-select: none;
+     -moz-user-select: none;
+     -ms-user-select: none;
+     user-select: none;
+     -webkit-tap-highlight-color: transparent;
+    }
+    .calculator input {
+     caret-color: transparent;
+    }
+  </style>
+  <body>
+  <div class="calculator">
+    <input type="text" id="display" disabled>
+    <div class="buttons">
+      <button class="angka" onclick="press('7')">7</button>
+      <button class="angka" onclick="press('8')">8</button>
+      <button class="angka" onclick="press('9')">9</button>
+      <button class="operator" onclick="press('/')">/</button>
+     
+      <button class="angka" onclick="press('4')">4</button>
+      <button class="angka" onclick="press('5')">5</button>
+      <button class="angka" onclick="press('6')">6</button>
+      <button class="operator" onclick="press('*')">*</button>
+      
+      <button class="angka" onclick="press('1')">1</button>
+      <button class="angka" onclick="press('2')">2</button>
+      <button class="angka" onclick="press('3')">3</button>
+      <button class="operator" onclick="press('-')">-</button>
+      
+      <button class="clear" onclick="ClearDisplay()">C</button>
+      <button class="angka" onclick="press('0')">0</button>
+      <button class="deletes" onclick="deletes()">DEL</button>
+      <button class="operator" onclick="press('+')">+</button>
+      <button class="operator" onclick="press('.')">.</button>
+      <button class="operator" onclick="press('%')">%</button>
+      <button class="equal" onclick="calculate()">=</button>
+    </div>
+  </div>
+  <script>
+    const display = document.getElementById("display");
+    function press(value) {
+      const operators = ['+', '-', '*', '/', '%'];
+      const lastChar = display.value.slice(-1);
+      if (value === '.') {
+        const parts = display.value.split(/[\+\-\*\/%]/);
+        const lastPart = parts[parts.length -1];
+        if (lastPart.includes('.')) return;
+      }
+      if (display.value === "0" && ! isNaN(value)) {
+        display.value = value;
+    } else if (/[+\-*/%]0$/.test(display.value) && ! isNaN(value)) {
+      display.value = display.value.slice(0,-1) + value;
+    } else if (operators.includes(value) && operators.includes(lastChar)) {
+      display.value =
+      display.value.slice(0,-1) + value;
+    } else {
+      display.value += value;
+    }
+   }
+    function ClearDisplay() {
+      display.value= "";
+    }
+    function deletes() {
+      display.value = display.value.slice(0,-1);
+    }
+    function calculate() {
+      try {
+        display.value = eval(display.value);
+      }catch{
+        display.value = "error";
+      }
+    }
+    document.addEventListener("keydown",function(e) {
+      const key = e.key;
+      if(!isNaN(key)) {
+        press(key);
+      } else if(['+','-','%','/','*'].includes(key)) {
+        press(key);
+    } else if(key === "Enter"){
+      e.preventDefault();
+      calculate();
+    } else if(key === "Backspace"){
+      deletes();
+    } else if(key === "Escape"){
+      ClearDisplay();
+    }
+      });
+  </script>
+  </body>
+  </html>
