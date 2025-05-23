@@ -16,6 +16,11 @@
       align-items: center;
       height: 100dvh;
       margin: 0;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     .nama{
       font-family: 'Luckiest Guy', cursive;
@@ -27,7 +32,7 @@
       5px 5px 0 #000,
       4px 4px 6px white;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 40px;
       margin-top: -60px;
     }
     .calculator{
@@ -117,7 +122,7 @@
       border-radius: 10px;
       background-color: #121212;
       box-shadow: 0px 3px 0px #CCC;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.5s ease-in-out;
       cursor: pointer;
     }
     .buttons button:active {
@@ -163,9 +168,6 @@
      user-select: none;
      -webkit-tap-highlight-color: transparent;
     }
-    .calculator input {
-     caret-color: transparent;
-    }
     html, body {
       overscroll-behavior-y: none;
       overflow: hidden;
@@ -203,53 +205,97 @@
   </div>
   <script>
     const display = document.getElementById("display");
+    
     function press(value) {
       const operators = ['+', '-', '*', '/', '%'];
       const lastChar = display.value.slice(-1);
+      
+      // Menangani titik desimal
       if (value === '.') {
         const parts = display.value.split(/[\+\-\*\/%]/);
-        const lastPart = parts[parts.length -1];
+        const lastPart = parts[parts.length - 1];
         if (lastPart.includes('.')) return;
       }
-      if (display.value === "0" && ! isNaN(value)) {
+      
+      // Cegah mulai dengan operator (kecuali minus untuk angka negatif)
+      if (display.value === "" && operators.includes(value) && value !== "-") {
+        return;
+      }
+      
+      // Cegah mulai dengan titik desimal
+      if (display.value === "" && value === ".") {
+        return;
+      }
+      
+      // Ganti nol di depan dengan angka
+      if (display.value === "0" && !isNaN(value)) {
         display.value = value;
-    } else if (/[+\-*/%]0$/.test(display.value) && ! isNaN(value)) {
-      display.value = display.value.slice(0,-1) + value;
-    } else if (operators.includes(value) && operators.includes(lastChar)) {
-      display.value =
-      display.value.slice(0,-1) + value;
-    } else {
-      display.value += value;
+        return;
+      }
+      
+      // Ganti nol setelah operator dengan angka
+      if (/[+\-*/%]0$/.test(display.value) && !isNaN(value)) {
+        display.value = display.value.slice(0, -1) + value;
+        return;
+      }
+      
+      // Menangani input operator - LOGIKA YANG DIPERBAIKI TOTAL
+      if (operators.includes(value)) {
+        // Jika karakter terakhir juga operator
+        if (operators.includes(lastChar)) {
+          // Kasus sangat khusus: izinkan minus HANYA setelah operator lain untuk angka negatif
+          // DAN hanya jika tidak ada operator berturut-turut sebelumnya
+          if (value === "-" && lastChar !== "-") {
+              display.value += value;
+            } else {
+              // Jika sudah ada operator berturut-turut, ganti semua dengan operator baru
+              display.value = display.value.slice(0, -1) + value;
+            }
+        } else {
+          // Jika karakter terakhir bukan operator, tambahkan operator
+          display.value += value;
+        }
+      } else {
+        // Untuk angka dan titik desimal, langsung tambahkan
+        display.value += value;
+      }
     }
-   }
+    
     function ClearDisplay() {
-      display.value= "";
+      display.value = "";
     }
+    
     function deletes() {
-      display.value = display.value.slice(0,-1);
+      display.value = display.value.slice(0, -1);
     }
+    
     function calculate() {
       try {
-        display.value = eval(display.value);
-      }catch{
+        // Hapus operator yang tertinggal di akhir sebelum menghitung
+        let expression = display.value.replace(/[+\-*/%]+$/, '');
+        if (expression) {
+          display.value = eval(expression);
+        }
+      } catch {
         display.value = "error";
       }
     }
-    document.addEventListener("keydown",function(e) {
+    
+    document.addEventListener("keydown", function(e) {
       const key = e.key;
-      if(!isNaN(key)) {
+      if (!isNaN(key)) {
         press(key);
-      } else if(['+','-','%','/','*'].includes(key)) {
+      } else if (['+', '-', '%', '/', '*'].includes(key)) {
         press(key);
-    } else if(key === "Enter"){
-      e.preventDefault();
-      calculate();
-    } else if(key === "Backspace"){
-      deletes();
-    } else if(key === "Escape"){
-      ClearDisplay();
-    }
-      });
+      } else if (key === "Enter") {
+        e.preventDefault();
+        calculate();
+      } else if (key === "Backspace") {
+        deletes();
+      } else if (key === "Escape") {
+        ClearDisplay();
+      }
+    });
   </script>
   </body>
   </html>
